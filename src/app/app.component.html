@@ -1,1 +1,23 @@
-<div></div>
+<mat-toolbar class="overflow-hidden" color="primary">
+  <img src="../assets/logo-transparent.png" alt="" class="logo" />
+  <span class="example-spacer"></span>
+  <button
+    type="button"
+    mat-stroked-button
+    (click)="drawer.toggle()"
+    color="accent"
+  >
+    New Banner
+  </button>
+</mat-toolbar>
+<mat-drawer-container class="example-container" autosize opened>
+  <mat-drawer #drawer class="example-sidenav" mode="side" position="end">
+    <h2 mat-headline-2 color="accent">New Banner</h2>
+  </mat-drawer>
+
+  <div
+    class="example-sidenav-content"
+    fxLayout="column"
+    fxLayoutAlign="top center"
+  ></div>
+</mat-drawer-container>
