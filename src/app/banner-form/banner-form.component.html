@@ -1,1 +1,167 @@
-<p></p>
+<!-- #postForm="ngForm" -->
+<div>
+  <form
+    class="form"
+    (ngSubmit)="onCreatePost(bannerForm.value)"
+    [formGroup]="bannerForm"
+  >
+    <mat-form-field appearance="outline" class="field-full-width">
+      <mat-label>Id</mat-label>
+      <input matInput id="id" formControlName="id" type="text" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="field-full-width">
+      <mat-label>Name</mat-label>
+      <input matInput id="name" formControlName="name" type="text" />
+      <mat-error>Name cannot be empty</mat-error>
+    </mat-form-field>
+
+    <div class="uploading-image">
+      <mat-label class="text-pink">Upload Image</mat-label>
+
+      <img [src]="uploadingImgUrl" height="200" alt="" />
+      <input
+        id="uploadingImg"
+        formControlName="uploadingImg"
+        type="file"
+        (change)="onselectFile($event)"
+        required
+      />
+      <mat-error
+        *ngIf="bannerForm.controls['uploadingImg'].hasError('required')"
+        >Upload Image</mat-error
+      >
+    </div>
+
+    <table class="example-full-width" cellspacing="0">
+      <tr>
+        <td></td>
+        <td>
+          <mat-form-field appearance="outline">
+            <mat-label>Select Channel</mat-label>
+            <mat-select id="channelId" formControlName="channelId" type="text">
+              <mat-option
+                *ngFor="let channel of channels"
+                [value]="channel.key"
+              >
+                {{ channel.name }}
+              </mat-option>
+            </mat-select>
+            <mat-error>Channel is required</mat-error>
+          </mat-form-field>
+        </td>
+      </tr>
+    </table>
+    <mat-form-field class="field-full-width" appearance="outline">
+      <mat-label>File Id</mat-label>
+      <input
+        matInput
+        id="fileId"
+        formControlName="fileId"
+        type="text"
+        ngModel
+        placeholder="File Id"
+      />
+    </mat-form-field>
+    <div class="field-2-container">
+      <mat-form-field appearance="outline" class="field-md-width">
+        <mat-label>Language</mat-label>
+
+        <mat-select id="language" formControlName="language" type="text">
+          <mat-option *ngFor="let language of languages" [value]="language.key">
+            {{ language.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error>Please select language</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field-md-width">
+        <mat-label>Zone</mat-label>
+
+        <mat-select id="zoneId" formControlName="zoneId" type="text">
+          <mat-option *ngFor="let zone of zones" [value]="zone.key">
+            {{ zone.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error>Please select zone</mat-error>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field class="field-full-width" appearance="outline">
+      <mat-label>Enter start and end date</mat-label>
+      <mat-date-range-input [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Start date"
+          id="startDate"
+          formControlName="startDate"
+          [min]="minDate"
+          required
+        />
+
+        <input
+          matEndDate
+          placeholder="End date"
+          id="endDate"
+          formControlName="endDate"
+          required
+        />
+      </mat-date-range-input>
+
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+      <mat-error *ngIf="bannerForm.controls['endDate'].hasError('required')"
+        >Can't be empty</mat-error
+      >
+      <mat-error *ngIf="bannerForm.controls['endDate'].errors"
+        >Invalid Date range</mat-error
+      >
+    </mat-form-field>
+    <p>
+      <mat-form-field class="field-full-width" appearance="outline">
+        <mat-label>URL</mat-label>
+        <input matInput id="url" formControlName="url" type="text" />
+      </mat-form-field>
+    </p>
+    <div>
+      <label>Active: </label>
+      <mat-radio-group id="active" formControlName="active" type="radio">
+        <mat-radio-button [value]="true" checked>True</mat-radio-button>
+        <mat-radio-button [value]="false">False</mat-radio-button>
+      </mat-radio-group>
+    </div>
+    <table class="field-full-width" cellspacing="0">
+      <tr>
+        <td>
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Priority</mat-label>
+            <input
+              matInput
+              id="priority"
+              formControlName="priority"
+              type="number"
+              min="0"
+            />
+            <mat-error>Can't be empty</mat-error>
+          </mat-form-field>
+        </td>
+      </tr>
+    </table>
+
+    <mat-form-field appearance="outline" class="field-full-width">
+      <mat-label>Labels</mat-label>
+
+      <mat-select id="labels" formControlName="labels" type="text" multiple>
+        <mat-option *ngFor="let label of labels" [value]="label.key">
+          {{ label.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error>Please select labels</mat-error>
+    </mat-form-field>
+    <div>
+      <button mat-raised-button type="submit" color="accent">Sumbit</button>
+    </div>
+  </form>
+</div>
