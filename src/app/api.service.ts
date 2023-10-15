@@ -9,6 +9,7 @@ import { Banner } from './banner.model';
 })
 export class ApiService {
   private endpointBannersFind = 'banners/find';
+  private endpointTypesFind = 'reference-data/find';
   private endpointGetImg = 'blob/';
   private endpointUploadImage = 'blob/upload';
   private domain: string | undefined;
@@ -58,5 +59,22 @@ export class ApiService {
     };
 
     return this.httpClient.post<any>(url, formData, httpOptions);
+  }
+
+  getTypes(): Observable<any> {
+    const url = `${this.domain}${this.endpointTypesFind}`;
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: environment.accessToken,
+      }),
+    };
+    const body = {
+      typeIds: ['1600', '1700', '1900', '2900'],
+      pageSize: 100,
+    };
+
+    return this.httpClient.post<any>(url, JSON.stringify(body), httpOptions);
   }
 }
