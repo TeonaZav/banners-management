@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
+import { Subject, throwError, Observable } from 'rxjs';
+import { Banner } from './banner.model';
 
 @Injectable({
   providedIn: 'root',
@@ -8,6 +10,7 @@ import { environment } from 'src/environments/environment';
 export class ApiService {
   private endpointBannersFind = 'banners/find';
   private endpointGetImg = 'blob/';
+  private endpointUploadImage = 'blob/upload';
   private domain: string | undefined;
 
   constructor(private httpClient: HttpClient) {
@@ -41,5 +44,19 @@ export class ApiService {
       headers: httpheaders,
       responseType: 'blob' as 'json',
     });
+  }
+
+  uploadImage(file: File) {
+    const url = `${this.domain}${this.endpointUploadImage}`;
+    const formData = new FormData();
+    formData.append('blob', file);
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: environment.accessToken,
+      }),
+    };
+
+    return this.httpClient.post<any>(url, formData, httpOptions);
   }
 }

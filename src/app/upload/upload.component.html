@@ -1,0 +1,71 @@
+<div appEventBlocker>
+  <div class="wrap-r-between">
+    <div class="wrap-r-center-ss">
+      <button
+        mat-mini-fab
+        color="primary"
+        (click)="fileUpload.click()"
+        type="button"
+        *ngIf="!uploadingImgUrl"
+      >
+        <mat-icon>attach_file</mat-icon>
+      </button>
+      <p>
+        <span class="text-pink text-wrap">{{
+          (fileName && "Uploaded file: ") || "Choose Image"
+        }}</span>
+        <span>{{ fileName }}</span>
+      </p>
+    </div>
+
+    <button
+      mat-raised-button
+      color="accent"
+      (click)="onUpload()"
+      type="button"
+      *ngIf="uploadingImgUrl"
+    >
+      Upload Image
+    </button>
+  </div>
+
+  <!-- Image - Dropbox -->
+  <ng-container
+    ><div
+      appEventBlocker
+      (dragend)="isDragover = false"
+      (dragover)="isDragover = true"
+      (dragenter)="isDragover = true"
+      (dragleave)="isDragover = false"
+      (mouseleave)="isDragover = false"
+      (drop)="onFileDrop($event)"
+      [ngClass]="{
+        'border-indigo': isDragover
+      }"
+      class="drop-box"
+      (click)="fileUpload.click()"
+      *ngIf="!uploadingImgUrl"
+    >
+      <h5 mat-headline-5>Drop your file here (Image only!)</h5>
+      <mat-error *ngIf="invalidImage">Invalid File Format!</mat-error>
+      <span class="material-icons spin">autorenew</span>
+    </div>
+    <!--  -->
+    <img
+      [src]="uploadingImgUrl"
+      height="200"
+      alt=""
+      class="full-w height-auto"
+    />
+
+    <input
+      class="hidden"
+      id="uploadingImg"
+      name="uploadingImg"
+      type="file"
+      (change)="onFileSelect($event)"
+      required
+      #fileUpload
+    />
+  </ng-container>
+</div>
