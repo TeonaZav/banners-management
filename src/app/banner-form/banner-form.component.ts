@@ -1,41 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+
 import {
   FormControl,
   Validators,
   FormBuilder,
   FormGroup,
 } from '@angular/forms';
-
+import { Subscription } from 'rxjs';
 import { Banner } from '../banner.model';
-import { BannerService } from '../banner.service';
 import { FloatLabelType } from '@angular/material/form-field';
+import { ApiService } from '../api.service';
 
-interface Channel {
+interface Type {
   id: string;
   typeId: string;
-  key: string;
-  name: string;
-}
-interface Language {
-  id: string;
   key: string;
   name: string;
   sortIndex: number;
   system: boolean;
-  typeId: string;
-}
-interface Zone {
-  id: string;
-  typeId: string;
-  key: string;
-  name: string;
-  sortIndex: number;
-}
-interface Label {
-  id: string;
-  typeId: string;
-  key: string;
-  name: string;
 }
 
 @Component({
@@ -44,6 +26,9 @@ interface Label {
   styleUrls: ['./banner-form.component.css'],
 })
 export class BannerFormComponent implements OnInit {
+  @Input()
+  uploadSub: Subscription;
+
   minDate: Date = new Date();
 
   floatLabelControl = new FormControl('yes' as FloatLabelType);
@@ -55,92 +40,40 @@ export class BannerFormComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private bannerService: BannerService
+    private apiService: ApiService
   ) {}
   getFloatLabelValue(): FloatLabelType {
     return this.floatLabelControl.value || ('true' as FloatLabelType);
   }
 
-  channels: Channel[] = [
-    {
-      id: '16000001',
-      typeId: '1600',
-      key: 'internet-bank',
-      name: 'Internet Bank',
-    },
-    {
-      id: '16000002',
-      typeId: '1600',
-      key: 'mobile-bank-ios',
-      name: 'Mobile Bank IOS',
-    },
-    {
-      id: '16000003',
-      typeId: '1600',
-      key: 'mobile-bank-android',
-      name: 'Mobile Bank Android',
-    },
-  ];
-  languages: Language[] = [
-    {
-      id: '29000001',
-      key: 'ka',
-      name: 'KA',
-      sortIndex: 0,
-      system: false,
-      typeId: '2900',
-    },
-  ];
-  zones: Zone[] = [
-    {
-      id: '17000001',
-      typeId: '1700',
-      key: 'dashboard-main',
-      name: 'Dashboard Main',
-      sortIndex: 0,
-    },
-    {
-      id: '17000002',
-      typeId: '1700',
-      key: 'dashboard-right',
-      name: 'Dashboard Right',
-      sortIndex: 0,
-    },
-    {
-      id: '17000003',
-      typeId: '1700',
-      key: 'dashboard-right-new',
-      name: 'Dashboard Right New',
-      sortIndex: 0,
-    },
-  ];
+  title = new FormControl('', {
+    validators: [Validators.required, Validators.minLength(3)],
+    nonNullable: true,
+  });
+  uploadForm = new FormGroup({ title: this.title });
 
-  labels: Label[] = [
-    { id: '19000001', typeId: '1900', key: 'affluent', name: 'Affluent' },
-
-    { id: '19000002', typeId: '1900', key: 'insider', name: 'Insider' },
-
-    { id: '19000003', typeId: '1900', key: 'payroll', name: 'Payroll' },
-
-    { id: '19000004', typeId: '1900', key: 'vip', name: 'VIP' },
-
-    { id: '19000005', typeId: '1900', key: 'social', name: 'Social' },
-
-    {
-      id: '19000006',
-      typeId: '1900',
-      key: 'non-resident',
-      name: 'Non Resident',
-    },
-
-    { id: '84839630', typeId: '1900', key: 'staff', name: 'Staff' },
-  ];
+  channels: Type[] = [];
+  languages: Type[] = [];
+  zones: Type[] = [];
+  labels: Type[] = [];
 
   ngOnInit(): void {
+    this.apiService.getTypes().subscribe({
+      next: (data) => {
+        const { entities: alltypes } = data.data;
+        console.log(alltypes);
+        this.channels = alltypes.filter((el: Type) => el.typeId === '1600');
+        this.zones = alltypes.filter((el: Type) => el.typeId === '1700');
+        this.labels = alltypes.filter((el: Type) => el.typeId === '1900');
+        this.languages = alltypes.filter((el: Type) => el.typeId === '2900');
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
     this.bannerForm = this.formBuilder.group({
       id: [],
       name: ['', Validators.required],
-      uploadingImg: ['', Validators.required],
       channelId: ['', Validators.required],
       fileId: ['', Validators.required],
       language: ['', Validators.required],
@@ -159,18 +92,5 @@ export class BannerFormComponent implements OnInit {
       return { notValid: true };
     }
     return null;
-  }
-  uploadingImgUrl = null;
-  onselectFile(e) {
-    if (e.target.files) {
-      let reader = new FileReader();
-      reader.readAsDataURL(e.target.files[0]);
-      reader.onload = (event: any) => {
-        this.uploadingImgUrl = event.target.result;
-      };
-    }
-  }
-  onCreatePost(postData: Banner) {
-    console.log(postData);
   }
 }

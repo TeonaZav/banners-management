@@ -1,57 +1,25 @@
-<!-- #postForm="ngForm" -->
 <div>
   <form
     class="form"
     (ngSubmit)="onCreatePost(bannerForm.value)"
     [formGroup]="bannerForm"
   >
-    <mat-form-field appearance="outline" class="field-full-width">
+    <h1 mat-headline-1 class="text-pink">New Banner</h1>
+    <!-- Id -->
+    <mat-form-field appearance="outline" class="field full-w">
       <mat-label>Id</mat-label>
       <input matInput id="id" formControlName="id" type="text" />
     </mat-form-field>
-    <mat-form-field appearance="outline" class="field-full-width">
+    <!-- Name -->
+    <mat-form-field appearance="outline" class="field full-w">
       <mat-label>Name</mat-label>
       <input matInput id="name" formControlName="name" type="text" />
       <mat-error>Name cannot be empty</mat-error>
     </mat-form-field>
-
-    <div class="uploading-image">
-      <mat-label class="text-pink">Upload Image</mat-label>
-
-      <img [src]="uploadingImgUrl" height="200" alt="" />
-      <input
-        id="uploadingImg"
-        formControlName="uploadingImg"
-        type="file"
-        (change)="onselectFile($event)"
-        required
-      />
-      <mat-error
-        *ngIf="bannerForm.controls['uploadingImg'].hasError('required')"
-        >Upload Image</mat-error
-      >
-    </div>
-
-    <table class="example-full-width" cellspacing="0">
-      <tr>
-        <td></td>
-        <td>
-          <mat-form-field appearance="outline">
-            <mat-label>Select Channel</mat-label>
-            <mat-select id="channelId" formControlName="channelId" type="text">
-              <mat-option
-                *ngFor="let channel of channels"
-                [value]="channel.key"
-              >
-                {{ channel.name }}
-              </mat-option>
-            </mat-select>
-            <mat-error>Channel is required</mat-error>
-          </mat-form-field>
-        </td>
-      </tr>
-    </table>
-    <mat-form-field class="field-full-width" appearance="outline">
+    <!-- Image -->
+    <app-upload-component class="full-w"></app-upload-component>
+    <!-- Image end -->
+    <mat-form-field class="field full-w" appearance="outline">
       <mat-label>File Id</mat-label>
       <input
         matInput
@@ -60,10 +28,23 @@
         type="text"
         ngModel
         placeholder="File Id"
+        required
       />
     </mat-form-field>
-    <div class="field-2-container">
-      <mat-form-field appearance="outline" class="field-md-width">
+    <!-- Channel -->
+    <mat-form-field appearance="outline" class="field full-w">
+      <mat-label>Select Channel</mat-label>
+      <mat-select id="channelId" formControlName="channelId" type="text">
+        <mat-option *ngFor="let channel of channels" [value]="channel.key">
+          {{ channel.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error>Channel is required</mat-error>
+    </mat-form-field>
+    <!-- Language and Zone-->
+    <div class="full-w flex flex-r-between">
+      <!-- Language -->
+      <mat-form-field appearance="outline" class="field md-w">
         <mat-label>Language</mat-label>
 
         <mat-select id="language" formControlName="language" type="text">
@@ -73,8 +54,8 @@
         </mat-select>
         <mat-error>Please select language</mat-error>
       </mat-form-field>
-
-      <mat-form-field appearance="outline" class="field-md-width">
+      <!-- Zone -->
+      <mat-form-field appearance="outline" class="field md-w">
         <mat-label>Zone</mat-label>
 
         <mat-select id="zoneId" formControlName="zoneId" type="text">
@@ -85,8 +66,8 @@
         <mat-error>Please select zone</mat-error>
       </mat-form-field>
     </div>
-
-    <mat-form-field class="field-full-width" appearance="outline">
+    <!-- Date Range -->
+    <mat-form-field class="field full-w" appearance="outline">
       <mat-label>Enter start and end date</mat-label>
       <mat-date-range-input [rangePicker]="picker">
         <input
@@ -119,23 +100,25 @@
         >Invalid Date range</mat-error
       >
     </mat-form-field>
-    <p>
-      <mat-form-field class="field-full-width" appearance="outline">
-        <mat-label>URL</mat-label>
-        <input matInput id="url" formControlName="url" type="text" />
-      </mat-form-field>
-    </p>
-    <div>
-      <label>Active: </label>
-      <mat-radio-group id="active" formControlName="active" type="radio">
-        <mat-radio-button [value]="true" checked>True</mat-radio-button>
-        <mat-radio-button [value]="false">False</mat-radio-button>
-      </mat-radio-group>
-    </div>
-    <table class="field-full-width" cellspacing="0">
+    <!-- URL -->
+    <mat-form-field class="field full-w" appearance="outline">
+      <mat-label>URL</mat-label>
+      <input matInput id="url" formControlName="url" type="text" />
+    </mat-form-field>
+    <!-- Active and priority -->
+    <table class="full-w" cellspacing="0">
       <tr>
         <td>
-          <mat-form-field class="example-full-width" appearance="outline">
+          <div class="full-w flex-r-between">
+            <label>Active: </label>
+            <mat-radio-group id="active" formControlName="active" type="radio">
+              <mat-radio-button [value]="true" checked>True</mat-radio-button>
+              <mat-radio-button [value]="false">False</mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </td>
+        <td>
+          <mat-form-field class="field full-w" appearance="outline">
             <mat-label>Priority</mat-label>
             <input
               matInput
@@ -149,8 +132,8 @@
         </td>
       </tr>
     </table>
-
-    <mat-form-field appearance="outline" class="field-full-width">
+    <!-- Labels -->
+    <mat-form-field appearance="outline" class="field full-w">
       <mat-label>Labels</mat-label>
 
       <mat-select id="labels" formControlName="labels" type="text" multiple>
@@ -161,7 +144,14 @@
       <mat-error>Please select labels</mat-error>
     </mat-form-field>
     <div>
-      <button mat-raised-button type="submit" color="accent">Sumbit</button>
+      <button
+        mat-raised-button
+        type="submit"
+        color="accent"
+        [disabled]="bannerForm.invalid"
+      >
+        Create Banner
+      </button>
     </div>
   </form>
 </div>
