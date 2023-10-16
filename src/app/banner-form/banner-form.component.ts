@@ -1,15 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 
-import {
-  FormControl,
-  Validators,
-  FormBuilder,
-  FormGroup,
-} from '@angular/forms';
+import { FormControl, FormBuilder, FormGroup, NgForm } from '@angular/forms';
+
 import { Subscription } from 'rxjs';
 import { Banner } from '../banner.model';
 import { FloatLabelType } from '@angular/material/form-field';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ApiService } from '../api.service';
+import { UploadComponent } from '../upload/upload.component';
 
 interface Type {
   id: string;
@@ -26,10 +24,15 @@ interface Type {
   styleUrls: ['./banner-form.component.css'],
 })
 export class BannerFormComponent implements OnInit {
+  @ViewChild(UploadComponent) uploadComponenRef: UploadComponent;
+  @ViewChild('f') form: NgForm;
+
   @Input()
   uploadSub: Subscription;
 
   minDate: Date = new Date();
+  defaultStartDate: Date = new Date();
+  defaultEndDate: Date = new Date();
 
   floatLabelControl = new FormControl('yes' as FloatLabelType);
   options = this.formBuilder.group({
@@ -39,18 +42,13 @@ export class BannerFormComponent implements OnInit {
   bannerForm!: FormGroup;
 
   constructor(
+    private http: HttpClient,
     private formBuilder: FormBuilder,
     private apiService: ApiService
   ) {}
   getFloatLabelValue(): FloatLabelType {
     return this.floatLabelControl.value || ('true' as FloatLabelType);
   }
-
-  title = new FormControl('', {
-    validators: [Validators.required, Validators.minLength(3)],
-    nonNullable: true,
-  });
-  uploadForm = new FormGroup({ title: this.title });
 
   channels: Type[] = [];
   languages: Type[] = [];
@@ -71,26 +69,29 @@ export class BannerFormComponent implements OnInit {
         console.log(err);
       },
     });
-    this.bannerForm = this.formBuilder.group({
-      id: [],
-      name: ['', Validators.required],
-      channelId: ['', Validators.required],
-      fileId: ['', Validators.required],
-      language: ['', Validators.required],
-      zoneId: ['', Validators.required],
-      startDate: ['', { Validators: this.checkDates }, Validators.required],
-      endDate: ['', { Validators: this.checkDates }],
-      url: ['', Validators.required],
-      active: ['', Validators.required],
-      priority: ['', Validators.required],
-      labels: ['', Validators.required],
-    });
+  }
+  ngAfterInit() {}
+  onCreatePost(postData: Banner) {
+    console.log(postData);
+    console.log(this.form);
+    this.apiService.createBanner(postData).subscribe(
+      (responseData) => {
+        console.log(responseData);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   }
 
-  checkDates(group: FormGroup) {
-    if (group.controls.endDate.value < group.controls.startDate.value) {
-      return { notValid: true };
+  checkDates(f: NgForm) {
+    let form = f.form;
+    if (!form.value.startDate || !form.value.endDate) {
+      return "Values can't be empty!";
+    } else if (form.value.endDate < form.value.startDate) {
+      return 'Invalid date range!';
     }
+
     return null;
   }
 }

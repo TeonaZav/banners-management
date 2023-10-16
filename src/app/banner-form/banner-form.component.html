@@ -1,40 +1,40 @@
 <div>
-  <form
-    class="form"
-    (ngSubmit)="onCreatePost(bannerForm.value)"
-    [formGroup]="bannerForm"
-  >
-    <h1 mat-headline-1 class="text-pink">New Banner</h1>
+  <form class="form" (ngSubmit)="onCreatePost(f.value)" #f="ngForm">
     <!-- Id -->
     <mat-form-field appearance="outline" class="field full-w">
       <mat-label>Id</mat-label>
-      <input matInput id="id" formControlName="id" type="text" />
+      <input matInput id="id" name="id" type="text" ngModel />
     </mat-form-field>
     <!-- Name -->
     <mat-form-field appearance="outline" class="field full-w">
       <mat-label>Name</mat-label>
-      <input matInput id="name" formControlName="name" type="text" />
+      <input matInput id="name" name="name" type="text" ngModel required />
       <mat-error>Name cannot be empty</mat-error>
     </mat-form-field>
     <!-- Image -->
-    <app-upload-component class="full-w"></app-upload-component>
-    <!-- Image end -->
-    <mat-form-field class="field full-w" appearance="outline">
-      <mat-label>File Id</mat-label>
+
+    <mat-form-field class="field full-w">
       <input
         matInput
         id="fileId"
-        formControlName="fileId"
-        type="text"
+        name="fileId"
+        [required]="!uploadComponenRef?.uploadedFileId"
+        [ngModel]="uploadComponenRef?.uploadedFileId"
         ngModel
-        placeholder="File Id"
-        required
+        readonly
       />
+      <mat-hint>Uploaded file id (Readonly)</mat-hint>
+      <mat-error>Please upload image!</mat-error>
+      <!--  -->
     </mat-form-field>
+    <app-upload-component class="full-w"></app-upload-component>
+
+    <!-- Image end -->
+
     <!-- Channel -->
     <mat-form-field appearance="outline" class="field full-w">
       <mat-label>Select Channel</mat-label>
-      <mat-select id="channelId" formControlName="channelId" type="text">
+      <mat-select id="channelId" name="channelId" type="text" ngModel required>
         <mat-option *ngFor="let channel of channels" [value]="channel.key">
           {{ channel.name }}
         </mat-option>
@@ -47,7 +47,7 @@
       <mat-form-field appearance="outline" class="field md-w">
         <mat-label>Language</mat-label>
 
-        <mat-select id="language" formControlName="language" type="text">
+        <mat-select id="language" name="language" type="text" ngModel required>
           <mat-option *ngFor="let language of languages" [value]="language.key">
             {{ language.name }}
           </mat-option>
@@ -58,7 +58,7 @@
       <mat-form-field appearance="outline" class="field md-w">
         <mat-label>Zone</mat-label>
 
-        <mat-select id="zoneId" formControlName="zoneId" type="text">
+        <mat-select id="zoneId" name="zoneId" type="text" ngModel required>
           <mat-option *ngFor="let zone of zones" [value]="zone.key">
             {{ zone.name }}
           </mat-option>
@@ -69,22 +69,23 @@
     <!-- Date Range -->
     <mat-form-field class="field full-w" appearance="outline">
       <mat-label>Enter start and end date</mat-label>
-      <mat-date-range-input [rangePicker]="picker">
+      <mat-date-range-input [rangePicker]="picker" [min]="minDate">
         <input
           matStartDate
           placeholder="Start date"
           id="startDate"
-          formControlName="startDate"
-          [min]="minDate"
+          name="startDate"
           required
+          [ngModel]="defaultStartDate"
         />
 
         <input
           matEndDate
           placeholder="End date"
           id="endDate"
-          formControlName="endDate"
+          name="endDate"
           required
+          [ngModel]="defaultEndDate"
         />
       </mat-date-range-input>
 
@@ -93,25 +94,28 @@
         [for]="picker"
       ></mat-datepicker-toggle>
       <mat-date-range-picker #picker></mat-date-range-picker>
-      <mat-error *ngIf="bannerForm.controls['endDate'].hasError('required')"
-        >Can't be empty</mat-error
-      >
-      <mat-error *ngIf="bannerForm.controls['endDate'].errors"
-        >Invalid Date range</mat-error
-      >
+      <mat-error>{{ checkDates(f) }}</mat-error>
     </mat-form-field>
     <!-- URL -->
     <mat-form-field class="field full-w" appearance="outline">
       <mat-label>URL</mat-label>
-      <input matInput id="url" formControlName="url" type="text" />
+      <input matInput id="url" name="url" type="text" ngModel required />
     </mat-form-field>
     <!-- Active and priority -->
     <table class="full-w" cellspacing="0">
       <tr>
         <td>
-          <div class="full-w flex-r-between">
+          <div class="full-w flex-r-start">
             <label>Active: </label>
-            <mat-radio-group id="active" formControlName="active" type="radio">
+            <mat-radio-group
+              id="active"
+              class="flex-c-start"
+              name="active"
+              type="radio"
+              ngModel
+              required
+              [ngModel]="true"
+            >
               <mat-radio-button [value]="true" checked>True</mat-radio-button>
               <mat-radio-button [value]="false">False</mat-radio-button>
             </mat-radio-group>
@@ -123,9 +127,11 @@
             <input
               matInput
               id="priority"
-              formControlName="priority"
+              name="priority"
               type="number"
               min="0"
+              ngModel
+              required
             />
             <mat-error>Can't be empty</mat-error>
           </mat-form-field>
@@ -136,8 +142,19 @@
     <mat-form-field appearance="outline" class="field full-w">
       <mat-label>Labels</mat-label>
 
-      <mat-select id="labels" formControlName="labels" type="text" multiple>
-        <mat-option *ngFor="let label of labels" [value]="label.key">
+      <mat-select
+        id="labels"
+        name="labels"
+        type="text"
+        multiple
+        ngModel
+        required
+      >
+        <mat-option
+          *ngFor="let label of labels"
+          [value]="label.key"
+          ([ngModel])="(label.key)"
+        >
           {{ label.name }}
         </mat-option>
       </mat-select>
@@ -148,7 +165,7 @@
         mat-raised-button
         type="submit"
         color="accent"
-        [disabled]="bannerForm.invalid"
+        [disabled]="f.invalid"
       >
         Create Banner
       </button>
