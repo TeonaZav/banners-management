@@ -12,6 +12,7 @@ export class ApiService {
   private endpointTypesFind = 'reference-data/find';
   private endpointGetImg = 'blob/';
   private endpointUploadImage = 'blob/upload';
+  private endpointBannerSave = 'banners/save';
   private domain: string | undefined;
 
   constructor(private httpClient: HttpClient) {
@@ -76,5 +77,21 @@ export class ApiService {
     };
 
     return this.httpClient.post<any>(url, JSON.stringify(body), httpOptions);
+  }
+
+  createBanner(data: Banner) {
+    const body = data;
+    return this.httpClient.post(
+      `${this.domain}${this.endpointBannerSave}`,
+      body,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          Authorization: environment.accessToken,
+        }),
+        reportProgress: true,
+        observe: 'events',
+      }
+    );
   }
 }
