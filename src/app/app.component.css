@@ -1,6 +1,7 @@
 .example-container {
   width: 100vw;
   height: 80vh;
+  background-color: #f2f2f2f2;
 }
 .example-sidenav {
   width: 95vw;
@@ -10,17 +11,74 @@
   flex: 1 1 auto;
 }
 .example-sidenav-content {
+  margin: 0 auto;
   padding: 3.2rem;
   width: 100rem;
 }
+.btn-close {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  color: #d8871e9f;
+  z-index: 100;
+}
+.logo {
+  width: 20rem;
+  margin: 0 16px;
+  cursor: pointer;
+}
+
+.toolbar-main {
+  width: 100vw;
+  height: 10rem;
+  color: #2c2c2afd;
+  background-color: #d8871e9f;
+  padding: 2rem 5%;
+  z-index: 1000;
+}
+.drawer-toolbar {
+  width: 95vw;
+  position: fixed;
+  background-color: #282c3bec;
+  z-index: 100;
+}
+footer {
+  background-color: #282c3be1;
+  color: #d8871e9f;
+  height: 12.6vh;
+  padding: 2rem 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.form-wrap {
+  margin: 8rem 0 6rem 0;
+}
+.btn-new {
+  background-color: #2a3149e3 !important;
+}
+
 @media (min-width: 48em) {
+  .toolbar-main {
+    padding: 3rem 10%;
+  }
   .example-sidenav {
     width: 50vw;
+  }
+  .drawer-toolbar {
+    width: 50vw;
+  }
+  footer {
+    padding: 4rem 10%;
   }
 }
 
 @media (min-width: 90em) {
   .example-sidenav {
+    width: 40vw;
+  }
+  .drawer-toolbar {
     width: 40vw;
   }
 }

@@ -19,8 +19,23 @@
 .md-w {
   width: 49%;
 }
+.flex-r-start {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2rem;
+}
 .flex-r-between {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.flex-c-start {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.negative-margin {
+  margin-bottom: -3rem;
 }

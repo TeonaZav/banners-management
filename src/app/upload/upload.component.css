@@ -17,12 +17,12 @@
 }
 .drop-box:hover {
   color: white;
-  background-color: rgb(199 210 254);
-  border: 1px solid rgb(199 210 254);
+  background-color: rgb(201, 205, 221);
+  border: 1px solid rgb(201, 205, 221);
 }
 .border-indigo {
-  background-color: rgb(199 210 254);
-  border: 1px solid rgb(199 210 254);
+  background-color: rgb(201, 205, 221);
+  border: 1px solid rgb(201, 205, 221);
 }
 .text-wrap {
   overflow-wrap: anywhere;
@@ -49,4 +49,14 @@
   gap: 1rem;
   margin-bottom: 1rem;
   flex-wrap: wrap;
+}
+.preUpload-ct {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+.uploadingPreview {
+  width: 4rem;
 }

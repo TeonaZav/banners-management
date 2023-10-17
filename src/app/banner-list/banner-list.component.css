@@ -1,6 +1,49 @@
 .table-image {
-  width: 4rem;
+  width: 7rem;
+  border-radius: 0.3rem;
 }
 .self-start {
   align-self: flex-start;
+}
+.tb-row {
+  cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+}
+.tb-row:hover {
+  background-color: rgba(154, 175, 233, 0.13);
+}
+
+.mat-column-active,
+.mat-column-labels {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 12% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+.mat-elevation-z8 {
+  box-shadow: 0px 5px 5px -3px rgb(0 0 0 / 20%),
+    0px 8px 10px 1px rgb(0 0 0 / 14%), 0px 3px 14px 2px rgb(0 0 0 / 12%);
+}
+
+.paginator {
+  background-color: #282c3bcc;
+  color: orange;
+}
+.btn-delete {
+  background-color: rgb(216, 119, 102);
+  width: 3rem;
+  height: 3rem;
+}
+.btn-delete:hover {
+  background-color: rgb(224, 74, 47);
 }
