@@ -1,9 +1,17 @@
 <div>
   <form class="form" (ngSubmit)="onCreatePost(f.value)" #f="ngForm">
     <!-- Id -->
+
     <mat-form-field appearance="outline" class="field full-w">
       <mat-label>Id</mat-label>
-      <input matInput id="id" name="id" type="text" ngModel />
+      <input
+        matInput
+        id="id"
+        name="id"
+        type="text"
+        ngModel
+        [readonly]="editMode"
+      />
     </mat-form-field>
     <!-- Name -->
     <mat-form-field appearance="outline" class="field full-w">
@@ -27,7 +35,10 @@
       <mat-error>Please upload image!</mat-error>
       <!--  -->
     </mat-form-field>
-    <app-upload-component class="full-w"></app-upload-component>
+    <app-upload-component
+      class="full-w"
+      [uploadedImg]="path"
+    ></app-upload-component>
 
     <!-- Image end -->
 
@@ -112,6 +123,7 @@
               class="flex-c-start"
               name="active"
               type="radio"
+              color="primary"
               ngModel
               required
               [ngModel]="true"
@@ -132,24 +144,33 @@
               min="0"
               ngModel
               required
+              pattern="^[0-9][0-9]*$"
             />
-            <mat-error>Can't be empty</mat-error>
+            <mat-error
+              >{{
+                (f.value.priority < 0 && "Value must be greater the 0") ||
+                  (!f.value.priority && "Can't be empty")
+              }}
+            </mat-error>
           </mat-form-field>
         </td>
       </tr>
     </table>
     <!-- Labels -->
+
     <mat-form-field appearance="outline" class="field full-w">
       <mat-label>Labels</mat-label>
 
-      <mat-select
-        id="labels"
-        name="labels"
-        type="text"
-        multiple
-        ngModel
-        required
-      >
+      <mat-select id="labels" name="labels" type="text" multiple [ngModel]="[]">
+        <button
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="onClearLabels()"
+          type="button"
+        >
+          <mat-icon class="clear-labels" color="warn">close</mat-icon>
+        </button>
         <mat-option
           *ngFor="let label of labels"
           [value]="label.key"
@@ -158,16 +179,19 @@
           {{ label.name }}
         </mat-option>
       </mat-select>
-      <mat-error>Please select labels</mat-error>
     </mat-form-field>
-    <div>
+
+    <div class="flex-r-between full-w">
       <button
         mat-raised-button
         type="submit"
-        color="accent"
+        color="primary"
         [disabled]="f.invalid"
       >
-        Create Banner
+        {{ editMode ? "UPDATE BANNER" : "CREATE BANNER" }}
+      </button>
+      <button mat-raised-button type="button" color="warn" (click)="onClear()">
+        CANCEL
       </button>
     </div>
   </form>

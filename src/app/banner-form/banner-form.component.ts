@@ -1,4 +1,11 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Inject,
+  ViewChild,
+  OnDestroy,
+} from '@angular/core';
 
 import { FormControl, FormBuilder, FormGroup, NgForm } from '@angular/forms';
 
@@ -23,9 +30,20 @@ interface Type {
   templateUrl: './banner-form.component.html',
   styleUrls: ['./banner-form.component.css'],
 })
-export class BannerFormComponent implements OnInit {
+export class BannerFormComponent implements OnInit, OnDestroy {
   @ViewChild(UploadComponent) uploadComponenRef: UploadComponent;
-  @ViewChild('f') form: NgForm;
+  @ViewChild('f', { static: false }) form: NgForm;
+
+  path = '';
+  channels: Type[] = [];
+  languages: Type[] = [];
+  zones: Type[] = [];
+  labels: Type[] = [];
+
+  subscription: Subscription;
+  editMode = false;
+  editedItemId: string;
+  editedItem: any;
 
   @Input()
   uploadSub: Subscription;
@@ -50,11 +68,6 @@ export class BannerFormComponent implements OnInit {
     return this.floatLabelControl.value || ('true' as FloatLabelType);
   }
 
-  channels: Type[] = [];
-  languages: Type[] = [];
-  zones: Type[] = [];
-  labels: Type[] = [];
-
   ngOnInit(): void {
     this.apiService.getTypes().subscribe({
       next: (data) => {
@@ -69,21 +82,88 @@ export class BannerFormComponent implements OnInit {
         console.log(err);
       },
     });
+
+    this.apiService.startEditing.subscribe((obj) => {
+      console.log(obj);
+      this.editMode = true;
+      this.editedItemId = obj.id;
+      this.path = obj.imgPath;
+      this.apiService.getOneBanner(obj.id).subscribe({
+        next: (data) => {
+          this.editedItem = data.data;
+          console.log(data.data);
+          const {
+            id,
+            name,
+            fileId,
+            channelId,
+            active,
+            startDate,
+            endDate,
+            labels,
+            language,
+            url,
+            priority,
+            zoneId,
+          } = data.data;
+          this.form.setValue({
+            id: id,
+            name: name,
+            fileId: fileId,
+            channelId: channelId,
+            active: active,
+            startDate: startDate,
+            endDate: endDate,
+            labels: labels,
+            language: language,
+            url: url,
+            priority: priority,
+            zoneId: zoneId,
+          });
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
+    });
   }
-  ngAfterInit() {}
+
+  ngOnDestroy(): void {
+    this.apiService.startEditing.unsubscribe();
+  }
+
   onCreatePost(postData: Banner) {
     console.log(postData);
     console.log(this.form);
     this.apiService.createBanner(postData).subscribe(
       (responseData) => {
         console.log(responseData);
+        this.editMode = false;
       },
       (error) => {
         console.log(error);
+        this.editMode = false;
       }
     );
   }
+  onClear() {
+    this.form.reset();
+    this.form.form.patchValue({
+      active: true,
+      startDate: new Date(),
+      endDate: new Date(),
+      fileId: this.uploadComponenRef?.uploadedFileId,
+      labels: [],
+    });
+    this.editMode = false;
+    this.path = '';
+  }
 
+  onClearLabels() {
+    this.form.form.patchValue({
+      labels: [],
+    });
+  }
   checkDates(f: NgForm) {
     let form = f.form;
     if (!form.value.startDate || !form.value.endDate) {

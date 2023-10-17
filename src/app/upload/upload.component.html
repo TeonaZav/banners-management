@@ -11,24 +11,34 @@
         <mat-icon>attach_file</mat-icon>
       </button>
       <p>
-        <span class="text-pink text-wrap">{{
-          (fileName && "Uploaded file: ") || "Choose Image"
-        }}</span>
+        <span class="text-orange text-wrap"
+          >{{
+            (!fileName && "Choose Image") ||
+              (fileName && !uploadedFileId && "File is Ready To Upload: ") ||
+              (fileName && uploadedFileId && "Uploaded file: ")
+          }}
+        </span>
         <span>{{ fileName }}</span>
       </p>
     </div>
-
-    <button
-      mat-raised-button
-      color="accent"
-      (click)="onUpload()"
-      type="button"
-      *ngIf="uploadingImgUrl"
-    >
-      Upload Image
-    </button>
+    <div class="preUpload-ct">
+      <button
+        mat-raised-button
+        color="basic"
+        (click)="onUpload()"
+        type="button"
+        *ngIf="uploadingImgUrl"
+        [disabled]="uploadedFileId"
+      >
+        Upload Image
+      </button>
+      <img
+        [src]="uploadingImgUrl"
+        alt=""
+        class="uploadingPreview height-auto"
+      />
+    </div>
   </div>
-
   <!-- Image - Dropbox -->
   <ng-container
     ><div
@@ -44,19 +54,14 @@
       }"
       class="drop-box"
       (click)="fileUpload.click()"
-      *ngIf="!uploadingImgUrl"
+      *ngIf="!uploadedFileId && !uploadedImg"
     >
       <h5 mat-headline-5>Drop your file here (Image only!)</h5>
       <mat-error *ngIf="invalidImage">Invalid File Format!</mat-error>
       <span class="material-icons spin">autorenew</span>
     </div>
     <!--  -->
-    <img
-      [src]="uploadingImgUrl"
-      height="200"
-      alt=""
-      class="full-w height-auto"
-    />
+    <img [src]="uploadedImg" height="200" alt="" class="full-w height-auto" />
 
     <input
       class="hidden"

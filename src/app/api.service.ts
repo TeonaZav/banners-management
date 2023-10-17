@@ -9,15 +9,19 @@ import { Banner } from './banner.model';
 })
 export class ApiService {
   private endpointBannersFind = 'banners/find';
+  private endpointBannerFind = 'banners/find-one';
   private endpointTypesFind = 'reference-data/find';
   private endpointGetImg = 'blob/';
   private endpointUploadImage = 'blob/upload';
+  private endpointRemoveImage = 'blob/remove';
   private endpointBannerSave = 'banners/save';
   private domain: string | undefined;
 
   constructor(private httpClient: HttpClient) {
     this.domain = environment.domain;
   }
+
+  startEditing = new Subject<any>();
 
   getAvailableBanners() {
     const url = `${this.domain}${this.endpointBannersFind}`;
@@ -32,6 +36,22 @@ export class ApiService {
       excludes: [''],
       searchAfter: [''],
       pageSize: 100,
+    };
+
+    return this.httpClient.post<any>(url, JSON.stringify(body), httpOptions);
+  }
+
+  getOneBanner(id: string) {
+    const url = `${this.domain}${this.endpointBannerFind}`;
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: environment.accessToken,
+      }),
+    };
+    const body = {
+      id: id,
     };
 
     return this.httpClient.post<any>(url, JSON.stringify(body), httpOptions);

@@ -4,8 +4,10 @@ import { map } from 'rxjs/operators';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Banner } from '../banner.model';
 import { ApiService } from '../api.service';
+import { DialogDeleteComponent } from './dialog-delete.component';
 
 @Component({
   selector: 'app-banner-list',
@@ -14,11 +16,10 @@ import { ApiService } from '../api.service';
 })
 export class BannerListComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild('paginator', { static: true })
+  @ViewChild('paginator', { static: true }) paginator!: MatPaginator;
   isLoading = false;
-  paginator!: MatPaginator;
+
   displaydColumns = [
-    'id',
     'url',
     'name',
     'active',
@@ -31,7 +32,7 @@ export class BannerListComponent implements OnInit {
   dataSource = new MatTableDataSource<Banner>();
   bannersChanged = new Subject<any[]>();
 
-  constructor(private apiService: ApiService) {}
+  constructor(private dialog: MatDialog, private apiService: ApiService) {}
 
   async ngOnInit() {
     this.apiService
@@ -41,6 +42,7 @@ export class BannerListComponent implements OnInit {
           this.isLoading = true;
           let newArr = [];
           let { entities } = responseData.data;
+          console.log(entities);
           entities.forEach((el) => {
             const { startDate, endDate } = el;
 
@@ -87,7 +89,16 @@ export class BannerListComponent implements OnInit {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }
+
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  getRecord(row: any) {
+    if (row) {
+      console.log(row);
+      console.log(row);
+      this.apiService.startEditing.next({ id: row.id, imgPath: row.imgPath });
+    }
   }
 }
