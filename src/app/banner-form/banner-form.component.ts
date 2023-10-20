@@ -275,6 +275,7 @@ export class BannerFormComponent implements OnInit, OnDestroy {
           let imgPath = event.target.result;
           this.uploadedImg = imgPath;
         };
+        this.store.dispatch(new UI.StopLoading());
       });
     });
   }
