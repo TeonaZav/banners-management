@@ -1,5 +1,14 @@
-.form {
+.form-ct {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 2.4rem;
+  gap: 2rem;
+  width: 100%;
+}
+
+.form {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -38,4 +47,73 @@
 }
 .negative-margin {
   margin-bottom: -3rem;
+}
+
+.btn-cancel {
+  align-self: flex-end;
+}
+.drop-box {
+  width: 100%;
+  padding: 10rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  border: 1px dashed rgb(156 163 175);
+  text-align: center;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
+    backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  transition-duration: 500ms;
+}
+.drop-box:hover {
+  color: white;
+  background-color: rgb(201, 205, 221);
+  border: 1px solid rgb(201, 205, 221);
+}
+.border-indigo {
+  background-color: rgb(201, 205, 221);
+  border: 1px solid rgb(201, 205, 221);
+}
+.text-wrap {
+  overflow-wrap: anywhere;
+}
+.spin {
+  text-align: center;
+  font-size: 3.75rem;
+  line-height: 1;
+  padding: 2rem;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.wrap-r-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.preUpload-ct {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+.uploadingPreview {
+  width: 4rem;
 }

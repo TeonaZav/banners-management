@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Subject, Observable, Subscription } from 'rxjs';
-import { map, switchMap, concatMap } from 'rxjs/operators';
+import { Subject, Observable, Subscription, merge } from 'rxjs';
+import { map, distinctUntilChanged, debounceTime, tap } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
@@ -28,6 +28,7 @@ export class BannerListComponent implements OnInit {
   bannersChanged = new Subject<any[]>();
   subscription: Subscription;
   deleteMode: boolean;
+  public filterSubject = new Subject<string>();
 
   displaydColumns = [
     'url',
@@ -51,6 +52,15 @@ export class BannerListComponent implements OnInit {
   ngOnInit() {
     this.isLoading$ = this.store.pipe(select(fromAppReducer.getIsLoading));
     this.getAllBanners();
+
+    // this.apiService.filterBanners('optio').subscribe({
+    //   next: (data) => {
+    //     console.log(data);
+    //   },
+    //   error: (err) => {
+    //     console.log(err);
+    //   },
+    // });
   }
 
   ngAfterViewInit() {
@@ -59,7 +69,16 @@ export class BannerListComponent implements OnInit {
   }
 
   applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    // this.dataSource.filter = filterValue.trim().toLowerCase();
+    let value = filterValue.trim().toLowerCase();
+    this.apiService.filterBanners(value).subscribe({
+      next: (data) => {
+        console.log(data);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
   }
 
   onDelete() {

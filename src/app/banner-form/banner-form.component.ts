@@ -1,17 +1,15 @@
 import { Component, OnInit, Input, ViewChild, OnDestroy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { map } from 'rxjs/operators';
 import { FormControl, FormBuilder, FormGroup, NgForm } from '@angular/forms';
-import { Subscription, Subject, Observable } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { Banner } from '../models/banner.model';
 import { FloatLabelType } from '@angular/material/form-field';
 import { ApiService } from '../api.service';
-import { UploadComponent } from '../upload/upload.component';
 import * as fromAppReducer from '../app.reducer';
 import * as UI from '../store/ui.actions';
 import * as BannersActions from '../store/banner.actions';
-
 import * as fromBannersReducer from '../app.reducer';
+import { HttpEventType } from '@angular/common/http';
 
 interface Type {
   id: string;
@@ -28,13 +26,38 @@ interface Type {
   styleUrls: ['./banner-form.component.css'],
 })
 export class BannerFormComponent implements OnInit, OnDestroy {
-  @ViewChild(UploadComponent) uploadComponenRef: UploadComponent;
+  // @ViewChild(UploadComponent) uploadComponenRef: UploadComponent;
   @ViewChild('f', { static: false }) form: NgForm;
   closeDrawer = false;
 
   formOpen = false;
-  path = '';
 
+  uploadedImg = '';
+
+  isDragover = false;
+  invalidImage = false;
+  uploadingImgUrl = null;
+  fileName = '';
+  uploadedFileId = null;
+
+  file: File | null = null;
+
+  uploadProgress: number;
+
+  showAlert = false;
+  alertMsg = 'Image is being uploaded...';
+  alertColor = 'blue';
+  inSubmission = false;
+  percentage = 0;
+  showPercentage = false;
+  isLoading$: Observable<boolean>;
+
+  bannerForm!: FormGroup;
+
+  floatLabelControl = new FormControl('yes' as FloatLabelType);
+  options = this.formBuilder.group({
+    floatLabel: this.floatLabelControl,
+  });
   subscription: Subscription;
   editMode = false;
   editedItemId: string;
@@ -47,12 +70,6 @@ export class BannerFormComponent implements OnInit, OnDestroy {
   minDate: Date = new Date();
   defaultStartDate: Date = new Date();
   defaultEndDate: Date = new Date();
-
-  floatLabelControl = new FormControl('yes' as FloatLabelType);
-  options = this.formBuilder.group({
-    floatLabel: this.floatLabelControl,
-  });
-  isLoading$: Observable<boolean>;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -68,7 +85,9 @@ export class BannerFormComponent implements OnInit, OnDestroy {
     this.isLoading$ = this.store.pipe(select(fromAppReducer.getIsLoading));
     this.getTypesData();
     this.fillFormForEdit();
+    this.isLoading$ = this.store.pipe(select(fromAppReducer.getIsLoading));
   }
+
   ngAfterInit() {
     this.apiService.startEditing.unsubscribe();
   }
@@ -83,7 +102,7 @@ export class BannerFormComponent implements OnInit, OnDestroy {
       next: (data) => {
         const newDataDis = {
           ...data.data,
-          imgPath: this.uploadComponenRef.uploadedImg,
+          imgPath: this.uploadedImg,
         };
         if (this.editMode) {
           this.store.dispatch(
@@ -112,31 +131,13 @@ export class BannerFormComponent implements OnInit, OnDestroy {
       active: true,
       startDate: new Date(),
       endDate: new Date(),
-      fileId: this.uploadComponenRef?.uploadedFileId,
+      fileId: this.uploadedFileId,
       labels: [],
     });
     if (this.editMode) {
       this.editMode = false;
-      this.path = '';
       this.formOpen = false;
     }
-  }
-
-  onClearLabels() {
-    this.form.form.patchValue({
-      labels: [],
-    });
-  }
-
-  checkDates(f: NgForm) {
-    let form = f.form;
-    if (!form.value.startDate || !form.value.endDate) {
-      return "Values can't be empty!";
-    } else if (form.value.endDate < form.value.startDate) {
-      return 'Invalid date range!';
-    }
-
-    return null;
   }
 
   getTypesData() {
@@ -154,14 +155,13 @@ export class BannerFormComponent implements OnInit, OnDestroy {
       },
     });
   }
+
   fillFormForEdit() {
     this.apiService.startEditing.subscribe((obj) => {
       console.log(obj);
       this.editMode = true;
       this.formOpen = true;
-
       this.editedItemId = obj.id;
-      this.path = obj.imgPath;
       if (obj?.id) {
         this.apiService.getOneBanner(obj.id).subscribe({
           next: (data) => {
@@ -201,6 +201,83 @@ export class BannerFormComponent implements OnInit, OnDestroy {
           },
         });
       }
+    });
+  }
+
+  onClearLabels() {
+    this.form.form.patchValue({
+      labels: [],
+    });
+  }
+
+  checkDates(f: NgForm) {
+    let form = f.form;
+    if (!form.value.startDate || !form.value.endDate) {
+      return "Values can't be empty!";
+    } else if (form.value.endDate < form.value.startDate) {
+      return 'Invalid date range!';
+    }
+
+    return null;
+  }
+
+  onFileSelect(e) {
+    this.store.dispatch(new UI.StartLoading());
+    if (e.target.files) {
+      this.file = e.target.files[0];
+      this.readImage(this.file);
+    }
+    this.store.dispatch(new UI.StopLoading());
+  }
+
+  onFileDrop($event: Event) {
+    this.store.dispatch(new UI.StartLoading());
+    this.isDragover = false;
+    this.file = ($event as DragEvent).dataTransfer?.files.item(0) ?? null;
+
+    this.readImage(this.file);
+    this.store.dispatch(new UI.StopLoading());
+  }
+
+  readImage(file: File) {
+    const format = file?.type.substring(0, 5);
+    if (!file || format !== 'image') {
+      this.invalidImage = true;
+      return;
+    }
+    this.fileName = file.name;
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event: any) => {
+      this.uploadingImgUrl = event.target.result;
+    };
+  }
+
+  onUpload() {
+    this.showAlert = true;
+    this.apiService.uploadImage(this.file).subscribe((event) => {
+      console.log(event);
+      this.uploadedFileId = event.data.id;
+      if (event.type === HttpEventType.UploadProgress) {
+        console.log(
+          'upload Progress: ' +
+            Math.round((event.loaded / event.total) * 100) +
+            '%'
+        );
+        this.uploadProgress = Math.round((event.loaded / event.total) * 100);
+      } else if (event.type === HttpEventType.Response) {
+        console.log(event);
+      }
+      this.apiService.getImage(this.uploadedFileId).subscribe((data) => {
+        console.log(data);
+        let reader = new FileReader();
+        reader.readAsDataURL(data);
+        reader.onload = (event: any) => {
+          let imgPath = event.target.result;
+          this.uploadedImg = imgPath;
+        };
+        this.store.dispatch(new UI.StopLoading());
+      });
     });
   }
 }
