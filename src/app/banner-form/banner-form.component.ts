@@ -5,10 +5,10 @@ import { Subscription, Observable } from 'rxjs';
 import { Banner } from '../models/banner.model';
 import { FloatLabelType } from '@angular/material/form-field';
 import { ApiService } from '../api.service';
-import * as fromAppReducer from '../app.reducer';
+import * as fromAppReducer from '../store/app.reducer';
 import * as UI from '../store/ui.actions';
 import * as BannersActions from '../store/banner.actions';
-import * as fromBannersReducer from '../app.reducer';
+import * as fromBannersReducer from '../store/app.reducer';
 import { HttpEventType } from '@angular/common/http';
 
 interface Type {
@@ -85,7 +85,6 @@ export class BannerFormComponent implements OnInit, OnDestroy {
     this.isLoading$ = this.store.pipe(select(fromAppReducer.getIsLoading));
     this.getTypesData();
     this.fillFormForEdit();
-    this.isLoading$ = this.store.pipe(select(fromAppReducer.getIsLoading));
   }
 
   ngAfterInit() {
@@ -96,8 +95,6 @@ export class BannerFormComponent implements OnInit, OnDestroy {
   }
 
   onSaveBanner(postData: Banner) {
-    console.log(postData);
-
     this.apiService.saveBanner(postData).subscribe({
       next: (data) => {
         const newDataDis = {
@@ -115,14 +112,13 @@ export class BannerFormComponent implements OnInit, OnDestroy {
           this.store.dispatch(new BannersActions.AddBanner(newDataDis));
         }
         this.editMode = false;
-        this.store.dispatch(new UI.StopLoading());
       },
       error: (err) => {
         console.log(err);
         this.editMode = false;
-        this.store.dispatch(new UI.StopLoading());
       },
     });
+    this.onCancel();
   }
 
   onCancel() {
@@ -131,12 +127,15 @@ export class BannerFormComponent implements OnInit, OnDestroy {
       active: true,
       startDate: new Date(),
       endDate: new Date(),
-      fileId: this.uploadedFileId,
+      fileId: '',
       labels: [],
     });
+
     if (this.editMode) {
       this.editMode = false;
       this.formOpen = false;
+      this.uploadedImg = '';
+      this.uploadingImgUrl = null;
     }
   }
 
@@ -195,6 +194,7 @@ export class BannerFormComponent implements OnInit, OnDestroy {
               priority: priority,
               zoneId: zoneId,
             });
+            this.uploadedImg = obj.imgPath;
           },
           error: (err) => {
             console.log(err);
@@ -266,10 +266,8 @@ export class BannerFormComponent implements OnInit, OnDestroy {
         );
         this.uploadProgress = Math.round((event.loaded / event.total) * 100);
       } else if (event.type === HttpEventType.Response) {
-        console.log(event);
       }
       this.apiService.getImage(this.uploadedFileId).subscribe((data) => {
-        console.log(data);
         let reader = new FileReader();
         reader.readAsDataURL(data);
         reader.onload = (event: any) => {

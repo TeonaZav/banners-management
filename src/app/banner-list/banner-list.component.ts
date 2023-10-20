@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Subject, Observable, Subscription, merge } from 'rxjs';
-import { map, distinctUntilChanged, debounceTime, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
@@ -8,8 +8,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { Banner } from '../models/banner.model';
 import { DialogDeleteComponent } from '../shared/alert/dialog-delete.component';
+
 import { ApiService } from '../api.service';
-import * as fromAppReducer from '../app.reducer';
+import * as fromAppReducer from '../store/app.reducer';
 import * as UI from '../store/ui.actions';
 import * as BannersActions from '../store/banner.actions';
 import * as fromBannersReducer from '../store/banner.reducers';
@@ -22,8 +23,9 @@ import * as fromBannersReducer from '../store/banner.reducers';
 export class BannerListComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('paginator', { static: true }) paginator!: MatPaginator;
-  id = '';
+
   isLoading$: Observable<boolean>;
+  searChKey = '';
 
   bannersChanged = new Subject<any[]>();
   subscription: Subscription;
@@ -51,16 +53,7 @@ export class BannerListComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading$ = this.store.pipe(select(fromAppReducer.getIsLoading));
-    this.getAllBanners();
-
-    // this.apiService.filterBanners('optio').subscribe({
-    //   next: (data) => {
-    //     console.log(data);
-    //   },
-    //   error: (err) => {
-    //     console.log(err);
-    //   },
-    // });
+    this.getAllBanners('');
   }
 
   ngAfterViewInit() {
@@ -69,16 +62,8 @@ export class BannerListComponent implements OnInit {
   }
 
   applyFilter(filterValue: string) {
-    // this.dataSource.filter = filterValue.trim().toLowerCase();
-    let value = filterValue.trim().toLowerCase();
-    this.apiService.filterBanners(value).subscribe({
-      next: (data) => {
-        console.log(data);
-      },
-      error: (err) => {
-        console.log(err);
-      },
-    });
+    this.searChKey = filterValue.trim().toLowerCase();
+    this.getAllBanners(this.searChKey);
   }
 
   onDelete() {
@@ -115,9 +100,9 @@ export class BannerListComponent implements OnInit {
     }
   }
 
-  getAllBanners() {
+  getAllBanners(name: string) {
     return this.apiService
-      .getAvailableBanners()
+      .getAvailableBanners(name)
       .pipe(
         map((responseData) => {
           let { entities } = responseData.data;

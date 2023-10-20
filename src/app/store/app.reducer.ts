@@ -4,7 +4,7 @@ import {
   createSelector,
 } from '@ngrx/store';
 
-import * as fromUi from './store/ui.reducer';
+import * as fromUi from './ui.reducer';
 
 export interface State {
   ui: fromUi.State;

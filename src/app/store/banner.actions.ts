@@ -29,15 +29,8 @@ export class RemoveBanner implements Action {
   constructor(public payload: string) {}
 }
 
-export class FilterBanner implements Action {
-  readonly type = FILTER_BANNERS;
-
-  constructor(public payload: string) {}
-}
-
 export type BannersActions =
   | SetBanners
   | AddBanner
   | UpdateBanner
-  | RemoveBanner
-  | FilterBanner;
+  | RemoveBanner;

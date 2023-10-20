@@ -16,7 +16,7 @@ import { EventBlockerDirective } from './shared/directives/event-blocker.directi
 import { DialogDeleteComponent } from './shared/alert/dialog-delete.component';
 
 import { bannerReducer } from './store/banner.reducers';
-import { reducers } from './app.reducer';
+import { reducers } from './store/app.reducer';
 
 @NgModule({
   declarations: [

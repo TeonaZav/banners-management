@@ -1,11 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { Subject, throwError, Observable } from 'rxjs';
-import { map, switchMap, mergeMap } from 'rxjs/operators';
+import { Subject, Observable } from 'rxjs';
+
 import { Store } from '@ngrx/store';
 import { Banner } from './models/banner.model';
-import * as fromAppReducer from './app.reducer';
+import * as fromAppReducer from './store/app.reducer';
 import * as UI from './store/ui.actions';
 
 @Injectable({
@@ -31,26 +31,11 @@ export class ApiService {
 
   startEditing = new Subject<any>();
 
-  getAvailableBanners() {
-    this.store.dispatch(new UI.StartLoading());
-    const url = `${this.domain}${this.endpointBannersFind}`;
+  getAvailableBanners(str: string) {
+    if (str === '') {
+      this.store.dispatch(new UI.StartLoading());
+    }
 
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: environment.accessToken,
-      }),
-    };
-    const body = {
-      sortBy: '',
-      sortDirection: 'asc',
-      pageSize: 100,
-    };
-
-    return this.httpClient.post<any>(url, JSON.stringify(body), httpOptions);
-  }
-
-  filterBanners(str: string) {
     const url = `${this.domain}${this.endpointBannersFind}`;
 
     const httpOptions = {
@@ -61,8 +46,8 @@ export class ApiService {
     };
     const body = {
       search: str,
+      sortBy: '',
       sortDirection: 'asc',
-      pageIndex: 0,
       pageSize: 100,
     };
 
@@ -146,7 +131,6 @@ export class ApiService {
   }
 
   saveBanner(data: Banner) {
-    this.store.dispatch(new UI.StartLoading());
     const url = `${this.domain}${this.endpointBannerSave}`;
     const httpOptions = {
       headers: new HttpHeaders({

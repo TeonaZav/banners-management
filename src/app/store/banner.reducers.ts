@@ -7,7 +7,7 @@ import {
   FILTER_BANNERS,
 } from './banner.actions';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import * as fromApp from '../app.reducer';
+import * as fromApp from './app.reducer';
 
 export interface BannersState {
   availableBanners: any[];
@@ -41,22 +41,13 @@ export function bannerReducer(state = initialState, action: BannersActions) {
         ...state.availableBanners.filter(
           (banner) => banner.id !== action.payload.id
         ),
-        ...action.payload.newBanner,
       };
-      // const updatedBanners = [...state.availableBanners];
-      // updatedBanners[action.payload.id] = updatedBanner;
       return {
         ...state,
         updatedBanners,
+        ...action.payload.newBanner,
       };
     case REMOVE_BANNER:
-      return {
-        ...state,
-        availableBanners: state.availableBanners.filter(
-          (banner) => banner.id !== action.payload
-        ),
-      };
-    case FILTER_BANNERS:
       return {
         ...state,
         availableBanners: state.availableBanners.filter(
