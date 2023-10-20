@@ -83,7 +83,6 @@ export class ApiService {
   }
 
   uploadImage(file: File) {
-    this.store.dispatch(new UI.StartLoading());
     const url = `${this.domain}${this.endpointUploadImage}`;
     const formData = new FormData();
     formData.append('blob', file);

@@ -118,7 +118,6 @@ export class BannerFormComponent implements OnInit, OnDestroy {
         this.editMode = false;
       },
     });
-    this.onCancel();
   }
 
   onCancel() {
@@ -130,12 +129,14 @@ export class BannerFormComponent implements OnInit, OnDestroy {
       fileId: '',
       labels: [],
     });
+    this.uploadingImgUrl = null;
 
+    this.fileName = '';
+    this.uploadedImg = '';
     if (this.editMode) {
       this.editMode = false;
       this.formOpen = false;
       this.uploadedImg = '';
-      this.uploadingImgUrl = null;
     }
   }
 
@@ -274,7 +275,6 @@ export class BannerFormComponent implements OnInit, OnDestroy {
           let imgPath = event.target.result;
           this.uploadedImg = imgPath;
         };
-        this.store.dispatch(new UI.StopLoading());
       });
     });
   }
