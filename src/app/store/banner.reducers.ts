@@ -4,12 +4,15 @@ import {
   ADD_BANNER,
   UPDATE_BANNER,
   REMOVE_BANNER,
+  FILTER_BANNERS,
 } from './banner.actions';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromApp from '../app.reducer';
 
 export interface BannersState {
   availableBanners: any[];
+  sortDirection: string;
+  sortKey: string;
 }
 export interface State extends fromApp.State {
   banner: BannersState;
@@ -17,6 +20,8 @@ export interface State extends fromApp.State {
 
 const initialState: BannersState = {
   availableBanners: [],
+  sortDirection: '',
+  sortKey: '',
 };
 
 export function bannerReducer(state = initialState, action: BannersActions) {
@@ -51,6 +56,14 @@ export function bannerReducer(state = initialState, action: BannersActions) {
           (banner) => banner.id !== action.payload
         ),
       };
+    case FILTER_BANNERS:
+      return {
+        ...state,
+        availableBanners: state.availableBanners.filter(
+          (banner) => banner.id !== action.payload
+        ),
+      };
+
     default:
       return state;
   }
