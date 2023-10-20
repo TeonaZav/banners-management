@@ -42,10 +42,26 @@ export class ApiService {
       }),
     };
     const body = {
-      // excludes: [''],
-      // searchAfter: [''],
-      // sortDirection: 'asc',
-      // sortBy: 'name',
+      sortBy: '',
+      sortDirection: 'asc',
+      pageSize: 100,
+    };
+
+    return this.httpClient.post<any>(url, JSON.stringify(body), httpOptions);
+  }
+
+  filterBanners(str: string) {
+    const url = `${this.domain}${this.endpointBannersFind}`;
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: environment.accessToken,
+      }),
+    };
+    const body = {
+      search: str,
+      sortDirection: 'asc',
       pageIndex: 0,
       pageSize: 100,
     };
