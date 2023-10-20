@@ -26,7 +26,7 @@
       class="example-sidenav"
       mode="side"
       position="end"
-      [opened]="this.bannerFormComponentRef?.formOpen"
+      [opened]="this.bannerFormComponentRef?.editMode"
     >
       <mat-toolbar class="drawer-toolbar box-shadow">
         <span class="text-orange"
@@ -47,17 +47,9 @@
         >
           <mat-icon class="btn-close">close</mat-icon>
         </button>
-        <button
-          mat-raised-button
-          *ngIf="this.bannerFormComponentRef?.editMode"
-          color="warn"
-          (click)="onCancel()"
-        >
-          Cancel
-        </button>
       </mat-toolbar>
       <div class="form-wrap">
-        <app-banner-form [cancelEditFromParent]="cancelEdit"> </app-banner-form>
+        <app-banner-form></app-banner-form>
       </div>
     </mat-drawer>
 
