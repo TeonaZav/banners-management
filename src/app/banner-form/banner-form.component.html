@@ -1,5 +1,15 @@
-<div>
-  <form class="form" (ngSubmit)="onCreatePost(f.value)" #f="ngForm">
+<div class="form-ct">
+  <button
+    class="btn-cancel"
+    mat-raised-button
+    type="button"
+    color="warn"
+    (click)="onCancel()"
+    #btnCancel
+  >
+    CANCEL
+  </button>
+  <form class="form" (ngSubmit)="onSaveBanner(f.value)" #f="ngForm">
     <!-- Id -->
 
     <mat-form-field appearance="outline" class="field full-w">
@@ -187,12 +197,11 @@
         type="submit"
         color="primary"
         [disabled]="f.invalid"
+        *ngIf="!(isLoading$ | async)"
       >
         {{ editMode ? "UPDATE BANNER" : "CREATE BANNER" }}
       </button>
-      <button mat-raised-button type="button" color="warn" (click)="onClear()">
-        CANCEL
-      </button>
+      <mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
     </div>
   </form>
 </div>

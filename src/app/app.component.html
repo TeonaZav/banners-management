@@ -1,28 +1,73 @@
 <div class="main-container">
-  <mat-toolbar class="overflow-hidden" color="primary">
-    <img src="../assets/logo-transparent.png" alt="" class="logo" />
+  <mat-toolbar class="toolbar-main box-shadow" color="primary">
+    <img
+      src="../assets/logo-transparent.png"
+      alt=""
+      class="logo"
+      (click)="drawer.close()"
+    />
+
     <span class="example-spacer"></span>
     <button
       type="button"
-      mat-stroked-button
+      mat-raised-button
       (click)="drawer.toggle()"
       color="accent"
+      class="btn-new"
+      *ngIf="!this.bannerFormComponentRef?.editMode"
+      #btnOpen
     >
-      New Banner
+      NEW BANNER
     </button>
   </mat-toolbar>
   <mat-drawer-container class="example-container" autosize opened>
-    <mat-drawer #drawer class="example-sidenav" mode="side" position="end">
-      <app-banner-form></app-banner-form>
+    <mat-drawer
+      #drawer
+      class="example-sidenav"
+      mode="side"
+      position="end"
+      [opened]="this.bannerFormComponentRef?.formOpen"
+    >
+      <mat-toolbar class="drawer-toolbar box-shadow">
+        <span class="text-orange"
+          >{{
+            (!this.bannerFormComponentRef?.editMode && "New") ||
+              (this.bannerFormComponentRef?.editMode && "Edit")
+          }}
+          Banner</span
+        >
+        <span class="example-spacer"></span>
+
+        <button
+          mat-icon-button
+          class="btn-close"
+          aria-label="Example icon-button with share icon"
+          (click)="drawer.close()"
+          *ngIf="!this.bannerFormComponentRef?.editMode"
+        >
+          <mat-icon class="btn-close">close</mat-icon>
+        </button>
+        <button
+          mat-raised-button
+          *ngIf="this.bannerFormComponentRef?.editMode"
+          color="warn"
+          (click)="onCancel()"
+        >
+          Cancel
+        </button>
+      </mat-toolbar>
+      <div class="form-wrap">
+        <app-banner-form [cancelEditFromParent]="cancelEdit"> </app-banner-form>
+      </div>
     </mat-drawer>
 
-    <div
-      class="example-sidenav-content"
-      fxLayout="column"
-      fxLayoutAlign="top center"
-    >
+    <div class="example-sidenav-content">
+      <app-alert *ngIf="drawer.opened"></app-alert>
       <app-banner-list></app-banner-list>
     </div>
   </mat-drawer-container>
-  <footer></footer>
+  <footer>
+    <p>&copy; 2023 Teona Zavrashvili</p>
+    <img src="../assets/logo-footer.png" alt="" class="logo" />
+  </footer>
 </div>

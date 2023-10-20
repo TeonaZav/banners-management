@@ -1,9 +1,14 @@
 import { Component, OnInit, Input, SimpleChange } from '@angular/core';
+import { Store, select } from '@ngrx/store';
+import { Subscription, Subject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 import { FormControl, FormBuilder, FormGroup } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { FloatLabelType } from '@angular/material/form-field';
 import { HttpEventType } from '@angular/common/http';
 import { ApiService } from '../api.service';
+import * as fromAppReducer from '../app.reducer';
+import * as UI from '../store/ui.actions';
 
 @Component({
   selector: 'app-upload-component',
@@ -22,7 +27,6 @@ export class UploadComponent implements OnInit {
   file: File | null = null;
 
   uploadProgress: number;
-  uploadSub: Subscription;
 
   minDate: Date = new Date();
   showAlert = false;
@@ -31,6 +35,7 @@ export class UploadComponent implements OnInit {
   inSubmission = false;
   percentage = 0;
   showPercentage = false;
+  isLoading$: Observable<boolean>;
 
   bannerForm!: FormGroup;
 
@@ -41,26 +46,33 @@ export class UploadComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private store: Store<fromAppReducer.State>
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.isLoading$ = this.store.pipe(select(fromAppReducer.getIsLoading));
+  }
 
   ngOnChanges(changes: SimpleChange) {
     console.log(changes);
   }
 
   onFileSelect(e) {
+    this.store.dispatch(new UI.StartLoading());
     if (e.target.files) {
       this.file = e.target.files[0];
       this.readImage(this.file);
     }
+    this.store.dispatch(new UI.StopLoading());
   }
   onFileDrop($event: Event) {
+    this.store.dispatch(new UI.StartLoading());
     this.isDragover = false;
     this.file = ($event as DragEvent).dataTransfer?.files.item(0) ?? null;
 
     this.readImage(this.file);
+    this.store.dispatch(new UI.StopLoading());
   }
 
   readImage(file: File) {
@@ -100,6 +112,7 @@ export class UploadComponent implements OnInit {
           console.log(imgPath);
           this.uploadedImg = imgPath;
         };
+        this.store.dispatch(new UI.StopLoading());
       });
     });
   }

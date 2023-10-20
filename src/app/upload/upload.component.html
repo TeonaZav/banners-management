@@ -27,8 +27,8 @@
         color="basic"
         (click)="onUpload()"
         type="button"
-        *ngIf="uploadingImgUrl"
         [disabled]="uploadedFileId"
+        *ngIf="uploadingImgUrl && !(isLoading$ | async)"
       >
         Upload Image
       </button>
@@ -58,7 +58,8 @@
     >
       <h5 mat-headline-5>Drop your file here (Image only!)</h5>
       <mat-error *ngIf="invalidImage">Invalid File Format!</mat-error>
-      <span class="material-icons spin">autorenew</span>
+      <!-- <span class="material-icons spin">autorenew</span> -->
+      <mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
     </div>
     <!--  -->
     <img [src]="uploadedImg" height="200" alt="" class="full-w height-auto" />
