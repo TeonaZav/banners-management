@@ -7,6 +7,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { Banner } from '../models/banner.model';
+import { DialogDeleteComponent } from '../shared/alert/dialog-delete.component';
 import { ApiService } from '../api.service';
 import * as fromAppReducer from '../app.reducer';
 import * as UI from '../store/ui.actions';
@@ -21,11 +22,12 @@ import * as fromBannersReducer from '../store/banner.reducers';
 export class BannerListComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('paginator', { static: true }) paginator!: MatPaginator;
-
+  id = '';
   isLoading$: Observable<boolean>;
 
   bannersChanged = new Subject<any[]>();
   subscription: Subscription;
+  deleteMode: boolean;
 
   displaydColumns = [
     'url',
@@ -41,7 +43,7 @@ export class BannerListComponent implements OnInit {
   dataSource = new MatTableDataSource<Banner>();
 
   constructor(
-    private dialog: MatDialog,
+    public dialog: MatDialog,
     private apiService: ApiService,
     private store: Store<fromBannersReducer.State>
   ) {}
@@ -57,15 +59,40 @@ export class BannerListComponent implements OnInit {
   }
 
   applyFilter(filterValue: string) {
-    this.store.dispatch(new UI.StartLoading());
     this.dataSource.filter = filterValue.trim().toLowerCase();
-    this.store.dispatch(new UI.StopLoading());
   }
 
+  onDelete() {
+    this.deleteMode = true;
+  }
+  /*get row id for delete or update banner*/
   getRecord(row: any) {
     if (row) {
       console.log(row);
-      this.apiService.startEditing.next({ id: row.id, imgPath: row.imgPath });
+      if (!this.deleteMode) {
+        this.apiService.startEditing.next({ id: row.id, imgPath: row.imgPath });
+      } else {
+        let dialogRef = this.dialog.open(DialogDeleteComponent, {
+          data: {
+            message: `Are you sure you want to delete this banner ${row.id}?`,
+          },
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+          console.log(result);
+          if (result == true) {
+            console.log(result, row.id);
+            this.store.dispatch(new BannersActions.RemoveBanner(row.id));
+            this.apiService.removeBanner(row.id).subscribe({
+              next: (data) => console.log(data),
+              error: (err) => console.log(err),
+            });
+            this.deleteMode = false;
+            this.store.dispatch(new UI.StopLoading());
+          } else {
+            this.deleteMode = false;
+          }
+        });
+      }
     }
   }
 

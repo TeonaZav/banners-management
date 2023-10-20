@@ -17,6 +17,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   imports: [
@@ -38,6 +39,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatSidenavModule,
     MatRadioModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
   ],
   exports: [
     MatInputModule,
@@ -58,6 +60,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatSidenavModule,
     MatRadioModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
   ],
 })
 export class MaterialModule {}
