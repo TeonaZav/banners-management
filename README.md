@@ -10,5 +10,4 @@ This is a solution to the Banners Management Module challenge
 - CSS
 
 ## URL
-
 https://teonazav.github.io/banners-management/banners-management/
